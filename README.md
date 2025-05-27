@@ -83,13 +83,13 @@ The initial models were trained using all available features, but both linear re
 
 | It. Nr | Model | Performance | Features | Description |
 |--------|--------|-------------|------------|---------------|
-| 1 | Linear Regression | Train: 0.073, Test: 0.072, <br>Train RMSE: 22.4, <br>Test RMSE: 21.4 | `DEST_CODE, AIRLINE_CODE, AIRCRAFT_CODE, Weather_Condition, Temperature, Dew_Point, Relative_Humidity,Total_Precipitation, Wind_Direction, Average_Wind_Speed, Wind_Peak_Gust, SeaLevel_Air_Pressure` | Weak Model, Not Under or Overfitting |
+| 1 | Linear Regression | Train: 0.073, Test: 0.072, <br>Train RMSE: 22.4, <br>Test RMSE: 21.4 | `DEST_CODE, AIRLINE_CODE, AIRCRAFT_CODE, Weather_Condition, Temperature, Dew_Point, Relative_Humidity,Total_Precipitation, Wind_Direction, Average_Wind_Speed, Wind_Peak_Gust, SeaLevel_Air_Pressure` | Underfitting |
 | 2 | Random Forest | Train: 0.882, Test: 0.101, <br>Train RMSE: 8, <br>Test RMSE: 21 | Same as It. 1 | Overfitting |
-| 3 | Linear Regression | Train: 0.084, Test: 0.066, <br>Train RMSE: 17, <br>Test RMSE: 18.3 | Same as It. 1<br>Removed Outliners: Value Delay minutes <0 set to 0 and removed Values over 120 min from the Dataset (see (#fig1 and #fig2))| Weak Model, Not Under or Overfitting |
+| 3 | Linear Regression | Train: 0.084, Test: 0.066, <br>Train RMSE: 17, <br>Test RMSE: 18.3 | Same as It. 1<br>Removed Outliners: Value Delay minutes <0 set to 0 and removed Values over 120 min from the Dataset (see (#fig1 and #fig2))| Underfitting |
 | 4 | Random Forest | Train: 0.885, Test: 0.175, <br>Train RMSE: 6, <br>Test RMSE: 17.2 | Same as It. 3 | Overfitting |
-| 5 | Linear Regression | Train: 0.091, Test: 0.074, <br>Train RMSE: 17, <br>Test RMSE: 18.2 | Added `Weekday` | Weak Model, Not Under or Overfitting |
+| 5 | Linear Regression | Train: 0.091, Test: 0.074, <br>Train RMSE: 17, <br>Test RMSE: 18.2 | Added `Weekday` | Underfitting |
 | 6 | Random Forest | Train: 0.885, Test: 0.17, <br>Train RMSE: 6, <br>Test RMSE: 17.2 | Same as It. 5 | Overfitting |
-| 7 | Linear Regression | Train: 0.075, Test: 0.058, <br>Train RMSE: 17.1, <br>Test RMSE: 18.3 | Reduced features after importance analysis <br> Still underfitting (see (#fig3 and #fig4)) <br>`DEST_CODE, Wind_Peak_Gust,AIRLINE_CODE, AIRCRAFT_CODE, Wind_Direction, SeaLevel_Air_Pressure, Temperature` | Weak Model, Not Under or Overfitting |
+| 7 | Linear Regression | Train: 0.075, Test: 0.058, <br>Train RMSE: 17.1, <br>Test RMSE: 18.3 | Reduced features after importance analysis <br> Still underfitting (see (#fig3 and #fig4)) <br>`DEST_CODE, Wind_Peak_Gust,AIRLINE_CODE, AIRCRAFT_CODE, Wind_Direction, SeaLevel_Air_Pressure, Temperature` | Underfitting |
 | 8 | Random Forest | Cross-validation accuracy: -0.1019 <br> Training accuracy: 0.8872 | Same as It. 7 |  |
 | 9 | Random Forest | CV R² mean: 0.182 | Same as It. 7  | 
 | 10 | Random Forest | Train: 0.886, Test: 0.169, <br>Train RMSE: 6, <br>Test RMSE: 17.2 | Same as It. 7 | Overfitting |
