@@ -6,7 +6,7 @@ ZRH Flight Delay Prediction is a End-to-End Machine Learning application that es
 
 ## Results
 
-The final model, deployed via Hugging Face, is a random forest regressor trained on a refined dataset. After testing multiple iterations, it became clear that the model tends to overfit. Although 7,487 samples were collected, they span only a three-week period and cover 265 different destinations. After removing outliers, this results in relatively few data points per destination, which limits the model’s generalization. Additionally, no distinction is made between airports with the same city designation (e.g., multiple airports in London using different IATA codes), which could impact accuracy. Despite these constraints, the model performs reasonably well given the available data, and future improvements could include extending the data collection period and refining destination encoding.
+The final model, deployed via Hugging Face, is a random forest regressor trained on a refined dataset. After testing multiple iterations, it became clear that the model tends to overfit. Although 7,487 samples were collected, they span only a three-week period and cover 265 different destinations. This results in relatively few data points per destination, which limits the model’s generalization. Additionally, no distinction is made between airports with the same city designation (e.g., multiple airports in London using different IATA codes), which could impact accuracy. Despite these constraints, the model performs reasonably well given the available data, and future improvements could include extending the data collection period and refining destination encoding.
 
 ### Name & URL
 | Name          | URL |
