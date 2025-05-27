@@ -6,6 +6,8 @@ ZRH Flight Delay Prediction is a End-to-End Machine Learning application that es
 
 ## Results
 
+The final model, deployed via Hugging Face, is a random forest regressor trained on a refined dataset. After testing multiple iterations, it became clear that the model tends to overfit — a likely result of limited data. Although 7,487 samples were collected, they span only a three-week period and cover 265 different destinations. After removing outliers, this results in relatively few data points per destination, which limits the model’s generalization. Additionally, no distinction is made between airports with the same city designation (e.g., multiple airports in London using different IATA codes), which could impact accuracy. Despite these constraints, the model performs reasonably well given the available data, and future improvements could include extending the data collection period and refining destination encoding.
+
 ### Name & URL
 | Name          | URL |
 |--------------|----|
@@ -69,27 +71,38 @@ Source: [Meteostat Developers](https://dev.meteostat.net/formats.html#time-forma
 ## Model Training
 
 ### Amount of Data
-- Total of 7'487 flight records collected for Zurich Airport (ZRH).
+- Total of 7'558 flight records collected for Zurich Airport (ZRH)
+- Total of 7'487 flight records after removing outliners
 
 ### Data Splitting Method (Train/Validation/Test)
 - First, a classic 80/20 train/test split was performed to evaluate initial models. Subsequently, 5-fold cross-validation was used to obtain more robust performance metrics and to better assess model generality.
 
 ### Performance
 
+The initial models were trained using all available features, but both linear regression and random forest showed weak generalization. To improve performance, I refined the dataset by removing outliers (delays < 0 set to 0, values > 120 minutes removed) and added the Weekday feature, which had minimal impact. After analyzing feature importance, I retrained the models using only the top 7 features. While random forest continued to overfit, linear regression remained weak—partly due to the use of integer encoding for categorical variables like airline, aircraft, and destination, which is not ideal for linear models. So i selected the Random Forrest Modell to deploy it on huggingface.
+
 | It. Nr | Model | Performance | Features | Description |
 |--------|--------|-------------|------------|---------------|
-| 1 | Linear Regression | Train: 0.56, Test: 0.42, <br>Train RMSE: 831, Test RMSE: 974 | `rooms, area, pop, pop_dens, frg_pct, emp, tax_income` | Underfitting |
-| 2 | Random Forest | Train: 0.88, Test: 0.44, <br>Train RMSE: 428, Test RMSE: 964 | Same as It. 1 | Overfitting |
-| 3 | Random Forest | Mean RMSE: -673.8 | Same as It. 1 | Underfitting |
-| 4 | Random Forest | Mean RMSE: -136.2 | Added `room_per_m2, price_per_m2` | Used price_per_m2, making it unrealistic |
-| 5 | Random Forest | Mean RMSE: -661.0 | Added `luxurious, temporary, furnished` | Underfitting |
-| 6 | Random Forest | Mean RMSE: -660.4 | Added `area_cat_encoded` | Underfitting |
-| 7 | Random Forest | Mean RMSE: -617.0 | `['rooms', 'area', 'pop', 'pop_dens', 'frg_pct', 'emp', 'tax_income', 'room_per_m2', 'luxurious', 'temporary', 'furnished', 'area_cat_ecoded', '(LUXURIÖS)',  '(POOL)', '(SEESICHT)',  '(EXKLUSIV)', '(ATTIKA)', '(LOFT)', 'Kreis 6', 'Kreis 11', 'Kreis 12', 'Kreis 10', 'Kreis 4', 'Kreis 1', 'Kreis 9', 'Kreis 5', 'Kreis 7', 'Kreis 3', 'Kreis 2', 'Kreis 8']` | Added one-hot encoded features for luxury types and Zurich districts <br> Underfitting, incorrect city Zurich data |
-| 8 | Random Forest | Mean RMSE: -614.2 | Same as It. 7 | Fixed `pop` and `pop_dens` for Zurich city |
-| 9 | Random Forest | Mean RMSE: -617.6 | `['rooms', 'area', 'pop', 'pop_dens', 'frg_pct', 'emp', 'tax_income', 'room_per_m2', 'luxurious', 'temporary', 'furnished', 'area_cat_ecoded', 'zurich_city']` | Reduced features after importance analysis <br> Still underfitting (see (#fig1)
-| 10 | Random Forest | Mean RMSE: -612.6 | Same as It. 9 | Used GridSearch for best parameters |
-| 11 | Random Forest | Train: 0.94, Test: 0.65, Train RMSE: 255, Test RMSE: 638 | Same as It. 9 | Changed train/test split, resulted in overfitting |
+| 1 | Linear Regression | Train: 0.073, Test: 0.072, <br>Train RMSE: 22.4, <br>Test RMSE: 21.4 | `DEST_CODE, AIRLINE_CODE, AIRCRAFT_CODE, Weather_Condition, Temperature, Dew_Point, Relative_Humidity,Total_Precipitation, Wind_Direction, Average_Wind_Speed, Wind_Peak_Gust, SeaLevel_Air_Pressure` | Weak Model, Not Under or Overfitting |
+| 2 | Random Forest | Train: 0.882, Test: 0.101, <br>Train RMSE: 8, <br>Test RMSE: 21 | Same as It. 1 | Overfitting |
+| 3 | Linear Regression | Train: 0.084, Test: 0.066, <br>Train RMSE: 17, <br>Test RMSE: 18.3 | Same as It. 1<br>Removed Outliners: Value Delay minutes <0 set to 0 and removed Values over 120 min from the Dataset (see (#fig1 and #fig2))| Weak Model, Not Under or Overfitting |
+| 4 | Random Forest | Train: 0.885, Test: 0.175, <br>Train RMSE: 6, <br>Test RMSE: 17.2 | Same as It. 3 | Overfitting |
+| 5 | Linear Regression | Train: 0.091, Test: 0.074, <br>Train RMSE: 17, <br>Test RMSE: 18.2 | Added `Weekday` | Weak Model, Not Under or Overfitting |
+| 6 | Random Forest | Train: 0.885, Test: 0.17, <br>Train RMSE: 6, <br>Test RMSE: 17.2 | Same as It. 5 | Overfitting |
+| 7 | Linear Regression | Train: 0.075, Test: 0.058, <br>Train RMSE: 17.1, <br>Test RMSE: 18.3 | Reduced features after importance analysis <br> Still underfitting (see (#fig3 and #fig4)) <br>`DEST_CODE, Wind_Peak_Gust,AIRLINE_CODE, AIRCRAFT_CODE, Wind_Direction, SeaLevel_Air_Pressure, Temperature` | Weak Model, Not Under or Overfitting |
+| 8 | Random Forest | Cross-validation accuracy: -0.1019 <br> Training accuracy: 0.8872 | Same as It. 7 |  |
+| 9 | Random Forest | CV R² mean: 0.182 | Same as It. 7  | 
+| 10 | Random Forest | Train: 0.886, Test: 0.169, <br>Train RMSE: 6, <br>Test RMSE: 17.2 | Same as It. 7 | Overfitting |
+
 
 ## References
 
+### #Fig1 Distribution before
+![Feature Importance](doc/Verteilung_Vorher.png "Distribution")<span id="fig1"></span>
+### #Fig2 Distribution after
+![Feature Importance](doc/Verteilung_Nachher.png "Distribution")<span id="fig2"></span>
+### #Fig3 Importance analysis before
+![Feature Importance](doc/Importance_analysis_before.png "Feature Importance")<span id="fig1"></span>
+### #Fig4 Importance analysis after
+![Feature Importance](doc/Importance_analysis_after.png "Feature Importance")<span id="fig1"></span>
 
